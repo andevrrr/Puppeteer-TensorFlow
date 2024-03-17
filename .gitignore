@@ -1,6 +1,10 @@
 # Ignore node_modules directory
 node_modules/
 
+html/
+performance/
+screenshots/
+
 # Ignore build artifacts
 build/
 dist/
@@ -26,3 +30,4 @@ package-lock.json
 
 # Ignore yarn.lock for Yarn
 yarn.lock
+
