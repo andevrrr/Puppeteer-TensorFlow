@@ -1,12 +1,13 @@
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
 const fs = require("fs");
 const path = require("path");
-require('dotenv').config();
+require("dotenv").config();
 
 const PROXY_HOST = process.env.PROXY_HOST;
 const PROXY_PORT = process.env.PROXY_PORT;
 const USERNAME = process.env.USERNAME;
 const PASSWORD = process.env.PASSWORD;
+const AUTH = `${USERNAME}:${PASSWORD}`;
 
 // Function to capture full-page screenshots
 async function captureScreenshot(page, url) {
@@ -44,21 +45,14 @@ async function savePerformanceMetrics(page, url) {
 }
 
 async function scrapeWebsite(url) {
-  const browser = await puppeteer.launch({
-    args: [
-        `--proxy-server=${PROXY_HOST}:${PROXY_PORT}`,
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
-    ]
-});
+  const browser = await puppeteer.connect({
+    browserWSEndpoint: `wss://${AUTH}@${PROXY_HOST}:${PROXY_PORT}`,
+  });
   const page = await browser.newPage();
 
-  await page.authenticate({
-    username: USERNAME,
-    password: PASSWORD
-});
+  page.setDefaultNavigationTimeout(2 * 60 * 1000);
 
-  await page.setViewport({ width: 1280, height: 800 });
+  //await page.setViewport({ width: 1280, height: 800 });
   await page.goto(url, { waitUntil: "networkidle2" });
   await autoScroll(page);
 
@@ -72,9 +66,9 @@ async function scrapeWebsite(url) {
     });
   });
 
-  await page.evaluate(_ => {
+  await page.evaluate(() => {
     window.scrollTo(0, 0);
-});
+  });
 
   await captureScreenshot(page, url);
   await saveHTML(page, url);
@@ -82,7 +76,7 @@ async function scrapeWebsite(url) {
 
   await browser.close();
 }
-scrapeWebsite("https://shardeum.instawp.xyz/").catch(console.error);
+scrapeWebsite("https://caracaranyc.com/").catch(console.error);
 
 async function autoScroll(page) {
   await page.evaluate(async () => {
