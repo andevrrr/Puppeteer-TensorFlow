@@ -1,6 +1,12 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
+require('dotenv').config();
+
+const PROXY_HOST = process.env.PROXY_HOST;
+const PROXY_PORT = process.env.PROXY_PORT;
+const USERNAME = process.env.USERNAME;
+const PASSWORD = process.env.PASSWORD;
 
 // Function to capture full-page screenshots
 async function captureScreenshot(page, url) {
@@ -38,8 +44,19 @@ async function savePerformanceMetrics(page, url) {
 }
 
 async function scrapeWebsite(url) {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: [
+        `--proxy-server=${PROXY_HOST}:${PROXY_PORT}`,
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+    ]
+});
   const page = await browser.newPage();
+
+  await page.authenticate({
+    username: USERNAME,
+    password: PASSWORD
+});
 
   await page.setViewport({ width: 1280, height: 800 });
   await page.goto(url, { waitUntil: "networkidle2" });
@@ -65,7 +82,7 @@ async function scrapeWebsite(url) {
 
   await browser.close();
 }
-scrapeWebsite("https://anton-kucherenko.com").catch(console.error);
+scrapeWebsite("https://shardeum.instawp.xyz/").catch(console.error);
 
 async function autoScroll(page) {
   await page.evaluate(async () => {
