@@ -4,6 +4,7 @@ node_modules/
 html/
 performance/
 screenshots/
+websiteData.json
 
 # Ignore build artifacts
 build/
