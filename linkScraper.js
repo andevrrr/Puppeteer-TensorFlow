@@ -52,8 +52,8 @@ const fs = require("fs");
       console.log(`Data for ${website.title}:`, website);
       websiteData.push(website);
 
-      count++;
-      if (count >= 2) break;
+      //count++;
+      //if (count >= 2) break;
     } catch (error) {
       if (error.name === "TimeoutError") {
         console.log(
