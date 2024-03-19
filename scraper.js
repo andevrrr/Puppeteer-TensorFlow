@@ -1,13 +1,6 @@
-const puppeteer = require("puppeteer-core");
+const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config();
-
-const PROXY_HOST = process.env.PROXY_HOST;
-const PROXY_PORT = process.env.PROXY_PORT;
-const USERNAME = process.env.USERNAME;
-const PASSWORD = process.env.PASSWORD;
-const AUTH = `${USERNAME}:${PASSWORD}`;
 
 // Function to capture full-page screenshots
 async function captureScreenshot(page, url) {
@@ -45,30 +38,19 @@ async function savePerformanceMetrics(page, url) {
 }
 
 async function scrapeWebsite(url) {
-  const browser = await puppeteer.connect({
-    browserWSEndpoint: `wss://${AUTH}@${PROXY_HOST}:${PROXY_PORT}`,
+  const browser = await puppeteer.launch({
+    headless: true,
   });
   const page = await browser.newPage();
 
   page.setDefaultNavigationTimeout(2 * 60 * 1000);
 
-  //await page.setViewport({ width: 1280, height: 800 });
   await page.goto(url, { waitUntil: "networkidle2", timeout: 180000 });
   await autoScroll(page);
 
   fs.mkdirSync(path.join(__dirname, "screenshots"), { recursive: true });
   fs.mkdirSync(path.join(__dirname, "html"), { recursive: true });
   fs.mkdirSync(path.join(__dirname, "performance"), { recursive: true });
-
-  await page.evaluate(() => {
-    return new Promise((resolve) => {
-      setTimeout(resolve, 5000); // Wait for 5 seconds
-    });
-  });
-
-  await page.evaluate(() => {
-    window.scrollTo(0, 0);
-  });
 
   await captureScreenshot(page, url);
   await saveHTML(page, url);
@@ -82,7 +64,7 @@ const websites = JSON.parse(fs.readFileSync("websiteData.json", "utf8"));
 async function scrapeAllWebsites() {
   for (const website of websites) {
     console.log(`Scraping: ${website.title}`);
-    await scrapeWebsite(website.link).catch(console.error); // Ensure each website is scraped sequentially
+    await scrapeWebsite(website.link).catch(console.error);
   }
 }
 
