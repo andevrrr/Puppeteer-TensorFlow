@@ -6,7 +6,7 @@ const fs = require("fs");
   const page = await browser.newPage();
 
   await page.goto(
-    "https://www.awwwards.com/websites/website_category_portfolio/"
+    "https://www.awwwards.com/websites/portfolio/"
   );
 
   const websites = await page.evaluate(() => {
