@@ -6,6 +6,9 @@ performance/
 screenshots/
 websiteData.json
 badDesigns.json
+bd-html/
+bd-performance/
+bd-screenshots/
 
 # Ignore build artifacts
 build/

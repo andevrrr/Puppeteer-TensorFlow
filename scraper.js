@@ -6,7 +6,7 @@ const path = require("path");
 async function captureScreenshot(page, url) {
   const screenshotPath = path.join(
     __dirname,
-    "screenshots",
+    "bd-screenshots",
     `${new URL(url).hostname}.png`
   );
   await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -18,7 +18,7 @@ async function saveHTML(page, url) {
   const html = await page.content();
   const htmlPath = path.join(
     __dirname,
-    "html",
+    "bd-html",
     `${new URL(url).hostname}.html`
   );
   fs.writeFileSync(htmlPath, html);
@@ -30,7 +30,7 @@ async function savePerformanceMetrics(page, url) {
   const metrics = await page.evaluate(() => JSON.stringify(window.performance));
   const metricsPath = path.join(
     __dirname,
-    "performance",
+    "bd-performance",
     `${new URL(url).hostname}.json`
   );
   fs.writeFileSync(metricsPath, metrics);
@@ -48,9 +48,9 @@ async function scrapeWebsite(url) {
   await page.goto(url, { waitUntil: "networkidle2", timeout: 180000 });
   await autoScroll(page);
 
-  fs.mkdirSync(path.join(__dirname, "screenshots"), { recursive: true });
-  fs.mkdirSync(path.join(__dirname, "html"), { recursive: true });
-  fs.mkdirSync(path.join(__dirname, "performance"), { recursive: true });
+  fs.mkdirSync(path.join(__dirname, "bd-screenshots"), { recursive: true });
+  fs.mkdirSync(path.join(__dirname, "bd-html"), { recursive: true });
+  fs.mkdirSync(path.join(__dirname, "bd-performance"), { recursive: true });
 
   await captureScreenshot(page, url);
   await saveHTML(page, url);
@@ -59,7 +59,7 @@ async function scrapeWebsite(url) {
   await browser.close();
 }
 
-const websites = JSON.parse(fs.readFileSync("websiteData.json", "utf8"));
+const websites = JSON.parse(fs.readFileSync("badDesigns.json", "utf8"));
 
 async function scrapeAllWebsites() {
   for (const website of websites) {
